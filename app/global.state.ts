@@ -11,12 +11,26 @@ export class GlobalState{
     private _subscriptions: Map<string, Array<Function>> = new Map<string, Array<Function>>();
 
     constructor(){
-        this._dataStream.subscribe((data) )
+        this._dataStream.subscribe((data) => this._onEvent(data));
     }
 
-    _onEvent(data: any): void {
+    notifyDataChanged(event: any, value: any): void {
+        let current = this._date[event];
+        if (current != value) {
+            this._date[event] = value;
+            this._date.next({
+                event: event,
+                data: this._date[event]
+            })
+        }
+    }
+
+
+    private _onEvent(data: any): void {
         let subscripters = this._subscriptions.get(data['event']) || [];
-        
+        subscripters.forEach((callback) => {
+            callback.call(null, data['data']);
+        })
     }
 
 }
